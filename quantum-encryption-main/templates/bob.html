@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bob - Data Receiver</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --dark-color: #343a40;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .quantum-icon {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), #0056b3);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .status-card {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .alert-card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .log-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #1a1a1a;
+            color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .btn-lg {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: linear-gradient(45deg, #2b3fb1, #331585);">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-atom me-2"></i>Quantum Hybrid QKD
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/alice"><i class="fas fa-user me-1"></i>Alice</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/bob"><i class="fas fa-user-friends me-1"></i>Bob</a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-inbox me-2"></i>Received Data</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="receivedDataContainer" class="text-center py-5">
+                            <i class="fas fa-inbox quantum-icon text-muted"></i>
+                            <h5 class="text-muted mt-3">No data received yet</h5>
+                            <p class="text-muted">Waiting for Alice to send transmission...</p>
+                        </div>
+
+                        <div id="dataDisplay" class="row" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-thermometer-half me-2"></i>Temperature Data</h6>
+                                        <h3 id="receivedTemp" class="text-primary">-- &deg;C</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-clock me-2"></i>Received At</h6>
+                                        <h5 id="receivedTime" class="text-info">--:--:--</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-shield-check me-2"></i>Verification Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="verificationStatus" class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Ready to receive and verify quantum-encrypted data from Alice.
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-4 text-center">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <i class="fas fa-key text-warning mb-2" style="font-size: 1.5rem;"></i>
+                                        <h6>Key Exchange</h6>
+                                        <span id="keyStatus" class="badge bg-secondary">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <i class="fas fa-lock text-success mb-2" style="font-size: 1.5rem;"></i>
+                                        <h6>Decryption</h6>
+                                        <span id="decryptStatus" class="badge bg-secondary">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <i class="fas fa-check-circle text-info mb-2" style="font-size: 1.5rem;"></i>
+                                        <h6>Verification</h6>
+                                        <span id="verifyStatus" class="badge bg-secondary">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i>Bob's Role</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-user-friends me-2"></i>About Bob</h6>
+                            <p class="mb-0">Bob is the trusted receiver who participates in quantum key distribution with Alice and verifies the integrity of received data.</p>
+                        </div>
+
+                        <h6 class="mt-4">Current Status:</h6>
+                        <div id="bobActivity" class="mt-3">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm text-success me-2" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span>Monitoring for transmissions...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Eavesdropping Detection</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="eavesdropAlert" class="alert alert-warning" style="display: none;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Eavesdropping Detected!</strong><br>
+                            Quantum bit error rate indicates potential interception.
+                        </div>
+
+                        <div id="secureAlert" class="alert alert-success">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            <strong>Secure Channel</strong><br>
+                            No eavesdropping detected in quantum key exchange.
+                        </div>
+
+                        <div class="mt-3">
+                            <h6>Quantum Bit Error Rate:</h6>
+                            <div class="progress">
+                                <div id="qberBar" class="progress-bar bg-success" role="progressbar" style="width: 0%">
+                                    <span id="qberText">0%</span>
+                                </div>
+                            </div>
+                            <small class="text-muted">Threshold: 11%</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        function updateStatus() {
+            socket.emit('get_status', { node: 'bob' });
+        }
+
+        // Update status every second
+        setInterval(updateStatus, 1000);
+
+        // Initial status update
+        updateStatus();
+
+        socket.on('status_update', function(data) {
+            const status = data.status;
+            const reason = data.reason || '';
+            const receivedData = data.received_data || '';
+            const message = data.message || '';
+            console.log('Bob status received:', status);
+            const bobActivity = document.getElementById('bobActivity');
+            const verificationStatus = document.getElementById('verificationStatus');
+
+            if (status === 'success') {
+                // Successful transmission, display the data
+                bobActivity.innerHTML = `
+                    <div class="alert alert-success mb-0">
+                        <i class="fas fa-check-circle me-2"></i>Data received and verified successfully!
+                    </div>
+                `;
+
+                verificationStatus.className = 'alert alert-success';
+                verificationStatus.innerHTML = `
+                    <i class="fas fa-shield-check me-2"></i>
+                    Data successfully received and verified using quantum key distribution.
+                `;
+
+                // Show decoded data from Bob when available.
+                if (receivedData) {
+                    document.getElementById('receivedDataContainer').style.display = 'none';
+                    document.getElementById('dataDisplay').style.display = 'block';
+                    document.getElementById('receivedTemp').textContent = receivedData;
+                    document.getElementById('receivedTime').textContent = new Date().toLocaleTimeString();
+                } else {
+                    // Fallback to patient_data file if decoded payload was not included.
+                    fetch('/patient_data.txt?t=' + new Date().getTime())
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.text();
+                        })
+                        .then(data => {
+                            document.getElementById('receivedDataContainer').style.display = 'none';
+                            document.getElementById('dataDisplay').style.display = 'block';
+                            document.getElementById('receivedTemp').textContent = data.trim();
+                            document.getElementById('receivedTime').textContent = new Date().toLocaleTimeString();
+                        })
+                        .catch(err => {
+                            console.log('Could not read patient data file', err);
+                            document.getElementById('receivedTemp').textContent = "Error reading file";
+                        });
+                }
+
+                // Update verification badges
+                document.getElementById('keyStatus').className = 'badge bg-success';
+                document.getElementById('keyStatus').textContent = 'Complete';
+                document.getElementById('decryptStatus').className = 'badge bg-success';
+                document.getElementById('decryptStatus').textContent = 'Success';
+                document.getElementById('verifyStatus').className = 'badge bg-success';
+                document.getElementById('verifyStatus').textContent = 'Verified';
+            } else if (status === 'eavesdropped') {
+                // Eavesdropping detected
+                bobActivity.innerHTML = `
+                    <div class="alert alert-danger mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Key generation aborted due to eavesdropping!
+                    </div>
+                `;
+
+                verificationStatus.className = 'alert alert-danger';
+                verificationStatus.innerHTML = `
+                    <i class="fas fa-shield-alt me-2"></i>
+                    ${message || 'Security breach detected! Quantum bit error rate exceeded threshold due to eavesdropping.'}
+                `;
+
+                // Show interception message
+                document.getElementById('receivedDataContainer').innerHTML = `
+                    <i class="fas fa-user-secret quantum-icon text-danger"></i>
+                    <h5 class="text-danger mt-3">Data Intercepted</h5>
+                    <p class="text-muted">Eve has intercepted the transmission. Key generation aborted.</p>
+                `;
+                document.getElementById('dataDisplay').style.display = 'none';
+                document.getElementById('receivedDataContainer').style.display = 'block';
+
+                // Update verification badges to show failure
+                document.getElementById('keyStatus').className = 'badge bg-danger';
+                document.getElementById('keyStatus').textContent = 'Aborted';
+                document.getElementById('decryptStatus').className = 'badge bg-danger';
+                document.getElementById('decryptStatus').textContent = 'Failed';
+                document.getElementById('verifyStatus').className = 'badge bg-danger';
+                document.getElementById('verifyStatus').textContent = 'Rejected';
+            } else if (status === 'auth_failed') {
+                // Authentication failure (e.g., MITM or invalid classical packet)
+                bobActivity.innerHTML = `
+                    <div class="alert alert-danger mb-0">
+                        <i class="fas fa-ban me-2"></i>Session aborted: authentication failed.
+                    </div>
+                `;
+
+                verificationStatus.className = 'alert alert-danger';
+                verificationStatus.innerHTML = `
+                    <i class="fas fa-user-shield me-2"></i>
+                    Authentication failed. ${reason ? 'Reason: ' + reason : ''}
+                `;
+
+                document.getElementById('receivedDataContainer').innerHTML = `
+                    <i class="fas fa-lock quantum-icon text-danger"></i>
+                    <h5 class="text-danger mt-3">Transmission Rejected</h5>
+                    <p class="text-muted">Classical-channel authentication did not pass, so Bob aborted processing.</p>
+                `;
+                document.getElementById('dataDisplay').style.display = 'none';
+                document.getElementById('receivedDataContainer').style.display = 'block';
+
+                document.getElementById('keyStatus').className = 'badge bg-danger';
+                document.getElementById('keyStatus').textContent = 'Failed';
+                document.getElementById('decryptStatus').className = 'badge bg-danger';
+                document.getElementById('decryptStatus').textContent = 'Stopped';
+                document.getElementById('verifyStatus').className = 'badge bg-danger';
+                document.getElementById('verifyStatus').textContent = 'Rejected';
+            } else {
+                bobActivity.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm text-success me-2" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span>Monitoring for transmissions...</span>
+                    </div>
+                `;
+
+                verificationStatus.className = 'alert alert-info';
+                verificationStatus.innerHTML = `
+                    <i class="fas fa-info-circle me-2"></i>
+                    Ready to receive and verify quantum-encrypted data from Alice.
+                `;
+            }
+        });
+
+        // Handle QBER updates from server
+        socket.on('qber_update', function(data) {
+            const qberValue = data.qber !== undefined ? data.qber : 0;
+            const qberBar = document.getElementById('qberBar');
+            const qberText = document.getElementById('qberText');
+            const secureAlert = document.getElementById('secureAlert');
+            const eavesdropAlert = document.getElementById('eavesdropAlert');
+
+            qberBar.style.width = qberValue + '%';
+            qberText.textContent = qberValue.toFixed(1) + '%';
+
+            if (qberValue > 11) {
+                qberBar.className = 'progress-bar bg-danger';
+                secureAlert.style.display = 'none';
+                eavesdropAlert.style.display = 'block';
+            } else {
+                qberBar.className = 'progress-bar bg-success';
+                secureAlert.style.display = 'block';
+                eavesdropAlert.style.display = 'none';
+            }
+        });
+
+        socket.on('refresh_status', function() {
+            updateStatus();
+        });
+    </script>
+</body>
+</html>

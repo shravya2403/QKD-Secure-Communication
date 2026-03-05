@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Hybrid QKD - Dashboard</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --dark-color: #343a40;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .quantum-icon {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), #0056b3);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .status-card {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .alert-card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .log-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #1a1a1a;
+            color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .btn-lg {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: linear-gradient(45deg, #2b3fb1, #331585);">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-atom me-2"></i>Quantum Hybrid QKD
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/alice"><i class="fas fa-user me-1"></i>Alice</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bob"><i class="fas fa-user-friends me-1"></i>Bob</a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-cogs me-2"></i>Simulation Control</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Choose Simulation Mode</h5>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="simulationMode" id="basicMode" value="basic" checked>
+                                        <label class="form-check-label" for="basicMode">
+                                            <strong>Basic QKD</strong><br>
+                                            <small class="text-muted">Secure communication between Alice and Bob only</small>
+                                        </label>
+                                    </div>
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="radio" name="simulationMode" id="eveMode" value="with_eve">
+                                        <label class="form-check-label" for="eveMode">
+                                            <strong>QKD with Eavesdropper</strong><br>
+                                            <small class="text-muted">Eve attempts to intercept the communication</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <button id="startSimulation" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-play me-2"></i>Start Simulation
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card status-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-atom quantum-icon"></i>
+                                        <h5>Quantum Network Status</h5>
+                                        <div id="networkStatus" class="mt-3">
+                                            <span class="badge bg-light text-dark">Ready</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-terminal me-2"></i>Real-time Logs</h4>
+                        <button id="clearLogs" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-trash me-1"></i>Clear
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="logContainer" class="log-container">
+                            <div class="text-center text-muted">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Waiting for simulation to start...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i>Network Participants</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="ms-3">
+                                <strong>Alice</strong><br>
+                                <small class="text-muted">IoMT Device with Temperature Sensor</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-user-friends text-white"></i>
+                            </div>
+                            <div class="ms-3">
+                                <strong>Bob</strong><br>
+                                <small class="text-muted">Data Receiver & Verifier</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>About</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2">This is a quantum key distribution system that combines:</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>BB84 Protocol</li>
+                            <li><i class="fas fa-check text-success me-2"></i>QOTP Encryption</li>
+                            <li><i class="fas fa-check text-success me-2"></i>IoMT Integration</li>
+                        </ul>
+                        <hr>
+                        <p class="mb-0"><strong>Navigate:</strong> Use the menu above to access individual participant interfaces.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        let simulationRunning = false;
+
+        document.getElementById('startSimulation').addEventListener('click', function() {
+            if (simulationRunning) {
+                alert('Simulation is already running!');
+                return;
+            }
+
+            const mode = document.querySelector('input[name="simulationMode"]:checked').value;
+            const eveActive = document.getElementById('eveMode').checked;
+
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Starting...';
+            this.disabled = true;
+
+            socket.emit('start_simulation', { mode: mode, eve_active: eveActive });
+        });
+
+        // Sync Eve toggle with global Eve status
+        socket.on('eve_status_changed', function(data) {
+            document.getElementById('eveMode').checked = data.active;
+            document.getElementById('basicMode').checked = !data.active;
+        });
+
+        document.getElementById('clearLogs').addEventListener('click', function() {
+            document.getElementById('logContainer').innerHTML = '<div class="text-center text-muted">Logs cleared</div>';
+        });
+
+        socket.on('simulation_started', function(data) {
+            simulationRunning = true;
+            document.getElementById('startSimulation').innerHTML = '<i class="fas fa-stop me-2"></i>Running...';
+            document.getElementById('networkStatus').innerHTML = '<span class="badge bg-success">Active</span>';
+        });
+
+        socket.on('simulation_complete', function() {
+            simulationRunning = false;
+            document.getElementById('startSimulation').innerHTML = '<i class="fas fa-play me-2"></i>Start Simulation';
+            document.getElementById('startSimulation').disabled = false;
+            document.getElementById('networkStatus').innerHTML = '<span class="badge bg-light text-dark">Ready</span>';
+        });
+
+        socket.on('log_update', function(data) {
+            const logContainer = document.getElementById('logContainer');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = data.log;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        });
+
+        socket.on('logs_history', function(data) {
+            const logContainer = document.getElementById('logContainer');
+            logContainer.innerHTML = '';
+            data.logs.forEach(log => {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.textContent = log;
+                logContainer.appendChild(logEntry);
+            });
+            logContainer.scrollTop = logContainer.scrollHeight;
+        });
+
+        socket.on('error', function(data) {
+            alert('Error: ' + data.message);
+            document.getElementById('startSimulation').innerHTML = '<i class="fas fa-play me-2"></i>Start Simulation';
+            document.getElementById('startSimulation').disabled = false;
+        });
+    </script>
+</body>
+</html>

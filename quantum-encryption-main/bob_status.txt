@@ -1,0 +1,1 @@
+{'status': 'eavesdropped', 'qber': 32.0, 'message': 'Key generation aborted due to eavesdropping detection'}
